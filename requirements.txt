@@ -1,0 +1,2 @@
+hieroglyph
+osuosl_hieroglyph_theme
