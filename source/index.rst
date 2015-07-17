@@ -12,11 +12,26 @@ How To Train Your Compiler
 .. figure:: /_static/DragonMedium.png
 	:align: center
 
+Who am I?
+---------
+
+* Ian Kronquist
+* Senior studying Computer Science at Oregon State University
+* Developer at the OSU Open Source Lab
+* Summer 2015 intern at Puppet Labs on the language team.
+
+About this talk
+---------------
+* This talk is available in several formats from 45 minutes to around an hour
+  and 15.
+* The shorter version you're watching on video today completely skips Just In
+  Time Compilers, which is the final section.
+
 What is a compiler or interpreter?
 ----------------------------------
-* Almost all of you use compilers, every day.
-* Even those of you who aren't programmers probably wind up using a special
-  kind of compiler in your web browser.
+* Quick review.
+* Even those of you who aren't programmers probably wind up using a compiler in
+  your web browser.
 
 .. figure:: /_static/dragon_book.jpg
 	:width: 30%
@@ -31,20 +46,27 @@ The difference between compilers and interpreters
 * It's not just black and white. There are lots of things in between, often
   called Just In Time compilers.
 
-Source code
------------
+The Cinch Language
+------------------
+
+* I am writing a compiler to demonstrate the principles you will see here
+  today.
+* It uses a highly simplified language to keep things simple and easy to
+  understand.
 
 .. code-block:: c
 
-	#include <stdio.h>
-
-	int main() {
-		puts("Hello world!");
+	function fibonacci ( number ) {
+		a = 0
+		b = 1
+		counter = 0
+		while ( counter < number ) {
+			tmp = a
+			a = b
+			b = tmp + a
+		}
+		return a
 	}
-
-.. figure:: /_static/three_headed.jpg
-	:align: center
-	:width: 30%
 
 Machine code
 ------------
@@ -78,33 +100,34 @@ Machine code
 What happened?
 --------------
 
-* Preprocessing.
+* (Optionally) Preprocessing and Macro expansion.
 * Compiler Front end:
 	* Lexing/tokenizing.
 	* Parsing.
 	* Compilation to an intermediate representation.
-	* Optimization.
+	* Platoform independent optimization.
 * Compiler Back end:
 	* Platform specific optimizations.
 	* Compilation to target machine code (Mach-O 64-bit executable x86_64)
 * Linking. Putting together multiple compiled files. We'll ignore this today.
 
-Lexing
-------
+Lexical Analysis
+----------------
 
 The code needs to be split into tokens.
 
 ::
 
-	int a = 1 + 3;
-	func(a,b,c);
+	# this is a comment
+	a = 1 + 3;
+	func ( a b c )
 
 Becomes something like:
 
 ::
 
-	int, a, =, 1, +, 3, ;
-	func, (, a, b, c, ), ;
+	['a', '=', '1', '+', '3']
+	['func', '(', 'a', 'b', 'c', ')'];
 
 Parsing and Grammars
 --------------------
@@ -112,32 +135,55 @@ Programming languages are like natural languages. They follow a set of rules
 called a grammar.
 
 Parsing happens according to a grammar. Grammars need to specify what happens
-in otherwise ambiguous situations.
+in otherwise ambiguous situations. Consider this example in C.
 
 ::
 
-	c = a+++++b
-	c = ((a++)++)+b
-	c = (a++)+(++b)
-	c = a+(++(++b))
+	c = a-----b
 
-Sample grammar for Lua
-----------------------
+Which does this mean?
 
 ::
 
-	var ::=  Name | prefixexp `[´ exp `]´ | prefixexp `.´ Name 
+	c = ((a--)--)-b
+	c = (a--)-(--b)
+	c = a-(--(--b))
 
-	varlist ::= var {`,´ var}
+Sample grammar for Cinch
+------------------------
 
-	statement ::=  varlist `=´ explist | 
-		 functioncall | 
-		 while expression do block end | 
-		 function funcname funcbody
+::
 
-	binop ::= `+´ | `-´ | `*´ | `/´ | `^´ | `%´ | `..´ | 
-		 `<´ | `<=´ | `>´ | `>=´ | `==´ | `~=´ | 
-		 and | or
+	int ::= [0-9]
+	id ::= [a-zA-Z]
+	expr ::= int | binary_expr | id | function_call
+	binary_expr ::= int operator expr | id operator expr
+				  | function_call operator expr
+	operator ::= '=' | '+' | '-'
+	stmt ::= expr | while_loop | if_statment | function_definition
+	stmt_list ::= stmt stmt_list | stmt | epsilon
+	expr_list ::= expr expr_list | expr | epsilon
+	id_list ::= id | id id_list | epsilon
+	if_stmt ::= 'if' '(' expr ')' '{' stmt_list '}'
+	while_loop ::= 'while' '(' expr ')' '{' stmt_list '}'
+	function_call ::= id '(' expr_list ')'
+	function_definition ::= 'function' id '(' id_list ')' '{' stmt_list '}'
+	return_stmt ::= 'return' expr
+
+Some Interesting Parts of the Grammar
+-------------------------------------
+
+::
+
+	integer_literal ::= [0-9]
+	identifier ::= [a-zA-Z]
+
+
+::
+
+	if_statement ::= 'if' '(' expression ')' '{' statement_list '}'
+	statement ::= expression | while_loop | if_statment | function_definition
+	statement_list ::= statement statement_list | statement | epsilon
 
 Parsing
 -------
