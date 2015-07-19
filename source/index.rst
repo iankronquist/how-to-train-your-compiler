@@ -2,8 +2,8 @@
 .. How To Train Your Compiler: The Dragon Book, condensed slides file, created by
    hieroglyph-quickstart on Fri Apr 17 10:25:20 2015.
 
-hack
-====
+How To Train Your Compiler
+==========================
 
 How To Train Your Compiler
 --------------------------
@@ -16,9 +16,13 @@ Who am I?
 ---------
 
 * Ian Kronquist
+* iankronquist@gmail.com
 * Senior studying Computer Science at Oregon State University
 * Developer at the OSU Open Source Lab
-* Summer 2015 intern at Puppet Labs on the language team.
+* Summer 2015 intern at Puppet Labs on the language team
+
+.. figure:: /_static/osllogo.png
+	:align: center
 
 About this talk
 ---------------
@@ -116,7 +120,7 @@ Lexical Analysis
 
 The code needs to be split into tokens.
 
-::
+.. code-block:: c
 
 	# this is a comment
 	a = 1 + 3;
@@ -124,7 +128,7 @@ The code needs to be split into tokens.
 
 Becomes something like:
 
-::
+.. code-block:: python
 
 	['a', '=', '1', '+', '3']
 	['func', '(', 'a', 'b', 'c', ')'];
@@ -137,13 +141,15 @@ called a grammar.
 Parsing happens according to a grammar. Grammars need to specify what happens
 in otherwise ambiguous situations. Consider this example in C.
 
-::
+.. code-block:: c
+
 
 	c = a-----b
 
 Which does this mean?
 
-::
+.. code-block:: c
+
 
 	c = ((a--)--)-b
 	c = (a--)-(--b)
@@ -156,16 +162,21 @@ Sample grammar for Cinch
 
 	int ::= [0-9]
 	id ::= [a-zA-Z]
-	expr ::= int | binary_expr | id | function_call
+	id_list ::= id | id id_list | epsilon
 	binary_expr ::= int operator expr | id operator expr
 				  | function_call operator expr
 	operator ::= '=' | '+' | '-'
+
 	stmt ::= expr | while_loop | if_statment | function_definition
 	stmt_list ::= stmt stmt_list | stmt | epsilon
+
+	expr ::= int | binary_expr | id | function_call
 	expr_list ::= expr expr_list | expr | epsilon
-	id_list ::= id | id id_list | epsilon
+
 	if_stmt ::= 'if' '(' expr ')' '{' stmt_list '}'
+
 	while_loop ::= 'while' '(' expr ')' '{' stmt_list '}'
+
 	function_call ::= id '(' expr_list ')'
 	function_definition ::= 'function' id '(' id_list ')' '{' stmt_list '}'
 	return_stmt ::= 'return' expr
@@ -207,9 +218,6 @@ Abstract Syntax Trees
 		return a;
 	}
 
-
-
-*... is worth two in the bush*
 
 .. figure:: /_static/worth_two_in_the_bush.jpg
 	:align: left
@@ -305,6 +313,10 @@ Building a Control Flow Graph
 A graph of the flow of the code through the program via function calls,
 if statements, loops, etc.
 
+.. figure:: /_static/control_flow_graph.png
+	:align: center
+	:width: 80%
+
 Optimization
 ------------
 
@@ -315,7 +327,36 @@ Optimization
   are only used once, and transformations are assigned to a new variable. This
   makes code easier to reason about and optimize.
 
-.. nextslide::
+
+Single Static Assignment
+------------------------
+
+Original code:
+
+.. code-block:: c
+
+	a = 1
+	b = a
+	a = b + 1
+
+SSA transformation:
+
+.. code-block:: c
+
+	a_1 = 1
+	b_1 = a_1
+	a_2 = b_1 + 1
+
+Optimized result:
+
+.. code-block:: c
+
+	a_1 = 1
+	a_2 = a_1 + 1
+
+
+Optimization
+------------
 
 Examples of optimizations:
 
