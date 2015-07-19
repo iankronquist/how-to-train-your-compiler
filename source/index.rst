@@ -46,30 +46,43 @@ What is a compiler or interpreter?
 
 The difference between compilers and interpreters
 -------------------------------------------------
+
 * Compilers take in human readable source code and emit machine executable
   instructions or byte code, usually as an executable file.
 * Interpreters take in human readable source code and execute it directly.
 * It's not just black and white. There are lots of things in between, often
   called Just In Time compilers.
 
-Source code
------------
+The Collatz Conjecture
+----------------------
+
+I need a simple example of a function with an 'if' statement.
+
+.. figure:: /_static/collatz.png
+	:align: center
+
+.. figure:: /_static/collatz_conjecture.png
+	:align: center
+	:width: 35%
+
+
+
+Compilers
+---------
+
 
 .. code-block:: c
 
-	#include <stdio.h>
-
-	int main() {
-		puts("Hello world!");
+	bool is_collatz(int candidate) {
+			if (candidate == 1) {
+					return true;
+			} else if (candidate % 2 == 0) { // If it's even
+					candidate = candidate / 2;
+			} else { // If it's odd
+					candidate = 3 * candidate + 1;
+			}
+			return is_collatz(candidate);
 	}
-
-.. figure:: /_static/three_headed.jpg
-	:align: center
-	:width: 30%
-
-
-Machine code
-------------
 
 ::
 
