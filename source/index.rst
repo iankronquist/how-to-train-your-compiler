@@ -30,6 +30,8 @@ About this talk
   and 15.
 * The shorter version you're watching on video today completely skips Just In
   Time Compilers, which is the final section.
+* The first part about compilers has examples in C.
+* The second part has examples in python.
 
 What is a compiler or interpreter?
 ----------------------------------
@@ -50,27 +52,21 @@ The difference between compilers and interpreters
 * It's not just black and white. There are lots of things in between, often
   called Just In Time compilers.
 
-The Cinch Language
-------------------
-
-* I am writing a compiler to demonstrate the principles you will see here
-  today.
-* It uses a highly simplified language to keep things simple and easy to
-  understand.
+Source code
+-----------
 
 .. code-block:: c
 
-	function fibonacci ( number ) {
-		a = 0
-		b = 1
-		counter = 0
-		while ( counter < number ) {
-			tmp = a
-			a = b
-			b = tmp + a
-		}
-		return a
+	#include <stdio.h>
+
+	int main() {
+		puts("Hello world!");
 	}
+
+.. figure:: /_static/three_headed.jpg
+	:align: center
+	:width: 30%
+
 
 Machine code
 ------------
@@ -122,16 +118,16 @@ The code needs to be split into tokens.
 
 .. code-block:: c
 
-	# this is a comment
-	a = 1 + 3;
-	func ( a b c )
+	// this is a comment
+	int a = 1 + 3;
+	func ( a, b, c )
 
 Becomes something like:
 
 .. code-block:: python
 
-	['a', '=', '1', '+', '3']
-	['func', '(', 'a', 'b', 'c', ')'];
+	['int', 'a', '=', '1', '+', '3']
+	['func', '(', 'a', ',', 'b', ',' 'c', ')'];
 
 Parsing and Grammars
 --------------------
@@ -474,6 +470,19 @@ Cons of interpreters
 * Slow
 * Programming errors are not encountered until runtime. Errors on
   rarely taken code paths may take some time to find.
+* You have to rewrite the interpreter for code to run.
+
+Questions? Feedback?
+--------------------
+*Thank you*
+
+Ian Kronquist
+
+iankronquist@gmail.com
+
+.. figure:: /_static/black_baby_dragon.jpg
+	:align: center
+	:width: 45%
 
 Saved by the bell: Just In Time compilers
 -----------------------------------------
