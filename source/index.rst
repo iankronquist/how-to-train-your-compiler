@@ -140,16 +140,14 @@ in otherwise ambiguous situations. Consider this example in C.
 .. code-block:: c
 
 
-	c = a-----b
+	c = a---b
 
 Which does this mean?
 
 .. code-block:: c
 
-
-	c = ((a--)--)-b
-	c = (a--)-(--b)
-	c = a-(--(--b))
+	c = (a--)-b
+	c = a-(--b)
 
 Sample grammar for Cinch
 ------------------------
