@@ -12,10 +12,9 @@ How To Train Your Compiler
 .. figure:: /_static/DragonMedium.png
 	:align: center
 
-Who am I?
----------
+Ian Kronquist
+-------------
 
-* Ian Kronquist
 * iankronquist@gmail.com
 * Senior studying Computer Science at Oregon State University
 * Developer at the OSU Open Source Lab
@@ -24,20 +23,30 @@ Who am I?
 .. figure:: /_static/osllogo.png
 	:align: center
 
-About this talk
----------------
-* This talk is available in several formats from 45 minutes to around an hour
-  and 15.
-* The shorter version you're watching on video today completely skips Just In
-  Time Compilers, which is the final section.
-* The first part about compilers has examples in C.
-* The second part has examples in python.
+The Talk
+--------
 
-What is a compiler or interpreter?
-----------------------------------
-* Quick review.
-* Even those of you who aren't programmers probably wind up using a compiler in
-  your web browser.
+* **Part 1: Compilers**
+
+  - Examples in simple C
+  - The front end vs. the back end
+  - Lexing and Parsing
+  - Analysis and optimization
+  - Pros and Cons
+
+* **Part 2: Interpreters**
+
+  - Examples in Python
+  - Builds on part 1
+  - Walking the Abstract Syntax Tree vs. Bytecode VMs
+  - Pros and cons
+
+The Dragon Book
+---------------
+
+* The grand old textbook on the subject.
+
+* Writing a compiler is as dangerous and complicated as slaying a dragon.
 
 .. figure:: /_static/dragon_book.jpg
 	:width: 30%
@@ -53,39 +62,20 @@ The difference between compilers and interpreters
 * It's not just black and white. There are lots of things in between, often
   called Just In Time compilers.
 
-The Collatz Conjecture
-----------------------
-
-I need a simple example of a function with an 'if' statement.
-
-.. figure:: /_static/collatz.png
-	:align: center
-
-.. figure:: /_static/collatz_conjecture.png
-	:align: center
-	:width: 35%
-
-
-
-Compilers
----------
-
+Compilation
+-----------
 
 .. code-block:: c
 
-	bool is_collatz(int candidate) {
-			if (candidate == 1) {
-					return true;
-			} else if (candidate % 2 == 0) { // If it's even
-					candidate = candidate / 2;
-			} else { // If it's odd
-					candidate = 3 * candidate + 1;
-			}
-			return is_collatz(candidate);
+	#include <stdio.h>
+
+	int main() {
+		printf("Hello world!");
 	}
 
 ::
 
+	$ hexdump a.out
 	0000000 cf fa ed fe 07 00 00 01 03 00 00 80 02 00 00 00
 	0000010 10 00 00 00 10 05 00 00 85 00 20 00 00 00 00 00
 	0000020 19 00 00 00 48 00 00 00 5f 5f 50 41 47 45 5a 45
@@ -96,33 +86,22 @@ Compilers
 	0000070 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
 	0000080 00 00 00 00 01 00 00 00 00 10 00 00 00 00 00 00
 	0000090 00 00 00 00 00 00 00 00 00 10 00 00 00 00 00 00
-	00000a0 07 00 00 00 05 00 00 00 06 00 00 00 00 00 00 00
-	00000b0 5f 5f 74 65 78 74 00 00 00 00 00 00 00 00 00 00
-	00000c0 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
-	00000d0 50 0f 00 00 01 00 00 00 21 00 00 00 00 00 00 00
-	00000e0 50 0f 00 00 04 00 00 00 00 00 00 00 00 00 00 00
-	00000f0 00 04 00 80 00 00 00 00 00 00 00 00 00 00 00 00
-	0000100 5f 5f 73 74 75 62 73 00 00 00 00 00 00 00 00 00
-	0000110 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
-	0000120 72 0f 00 00 01 00 00 00 06 00 00 00 00 00 00 00
-	0000130 72 0f 00 00 01 00 00 00 00 00 00 00 00 00 00 00
-	0000140 08 04 00 80 00 00 00 00 06 00 00 00 00 00 00 00
-	0000150 5f 5f 73 74 75 62 5f 68 65 6c 70 65 72 00 00 00
-	0000160 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
+	...
+
 
 What happened?
 --------------
 
-* (Optionally) Preprocessing and Macro expansion.
+* Preprocessing and Macro expansion. (Not today)
 * Compiler Front end:
 	* Lexing/tokenizing.
 	* Parsing.
 	* Compilation to an intermediate representation.
-	* Platoform independent optimization.
 * Compiler Back end:
+	* Platform independent optimization.
 	* Platform specific optimizations.
 	* Compilation to target machine code (Mach-O 64-bit executable x86_64)
-* Linking. Putting together multiple compiled files. We'll ignore this today.
+* Linking. Putting together multiple compiled files. (Not today)
 
 Lexical Analysis
 ----------------
@@ -140,10 +119,13 @@ Becomes something like:
 .. code-block:: python
 
 	['int', 'a', '=', '1', '+', '3']
-	['func', '(', 'a', ',', 'b', ',' 'c', ')'];
+	['func', '(', 'a', ',', 'b', ',', 'c', ')']
 
 Parsing and Grammars
 --------------------
+
+"All your base are belong to us" doesn't make a lot of sense.
+
 Programming languages are like natural languages. They follow a set of rules
 called a grammar.
 
@@ -151,7 +133,6 @@ Parsing happens according to a grammar. Grammars need to specify what happens
 in otherwise ambiguous situations. Consider this example in C.
 
 .. code-block:: c
-
 
 	c = a---b
 
@@ -162,46 +143,39 @@ Which does this mean?
 	c = (a--)-b
 	c = a-(--b)
 
-Sample grammar for Cinch
-------------------------
+Backtracking
+------------
+
+Sometimes grammars can be ambiguous.
+
+* "The old man the boat."
+* "The cotton clothing is made of grows in Mississippi."
+* "The florist sent the bouquet of flowers was very flattered."
+
+Language designers should be careful to design grammars and choose parsing
+strategies which avoid backtracking. It's expensive and confusing.
+
+Defining a grammar with BNF notation
+------------------------------------
+Grammars are usually defined in Backus-Naur Form. Here is a small part of the
+grammar for C.
 
 ::
 
-	int ::= [0-9]
-	id ::= [a-zA-Z]
-	id_list ::= id | id id_list | epsilon
-	binary_expr ::= int operator expr | id operator expr
-				  | function_call operator expr
-	operator ::= '=' | '+' | '-'
-
-	stmt ::= expr | while_loop | if_statment | function_definition
-	stmt_list ::= stmt stmt_list | stmt | epsilon
-
-	expr ::= int | binary_expr | id | function_call
-	expr_list ::= expr expr_list | expr | epsilon
-
-	if_stmt ::= 'if' '(' expr ')' '{' stmt_list '}'
-
-	while_loop ::= 'while' '(' expr ')' '{' stmt_list '}'
-
-	function_call ::= id '(' expr_list ')'
-	function_definition ::= 'function' id '(' id_list ')' '{' stmt_list '}'
-	return_stmt ::= 'return' expr
-
-Some Interesting Parts of the Grammar
--------------------------------------
+	if_stat    : 'if' '(' exp ')' stat
+			   | 'if' '(' exp ')' stat 'else' stat
 
 ::
 
-	integer_literal ::= [0-9]
-	identifier ::= [a-zA-Z]
-
+	stat       : cmpd_stat
+			   | if_stat
+			   | iter_stat
+			   | assgn_stat
 
 ::
 
-	if_statement ::= 'if' '(' expression ')' '{' statement_list '}'
-	statement ::= expression | while_loop | if_statment | function_definition
-	statement_list ::= statement statement_list | statement | epsilon
+	stat_list  : stat
+			   | stat_list stat
 
 Parsing
 -------
@@ -286,6 +260,32 @@ Look Ahead Left to Right Parsing
 * A type of Shift-Reduce parser, shifting through the list of tokens, and
   reducing the tree to use smaller symbols.
 
+Single Static Assignment
+------------------------
+
+Original code:
+
+.. code-block:: c
+
+	a = 1
+	b = a
+	a = b + 1
+
+SSA transformation:
+
+.. code-block:: c
+
+	a_1 = 1
+	b_1 = a_1
+	a_2 = b_1 + 1
+
+Optimized result:
+
+.. code-block:: c
+
+	a_1 = 1
+	a_2 = a_1 + 1
+
 
 Compilation to Intermediate Representation
 ------------------------------------------
@@ -295,6 +295,30 @@ Compilation to Intermediate Representation
   source code means
 * Also has machine details which can be used by the back end.
 * IR is machine agnostic.
+
+
+Three Address Code
+------------------
+
+.. code-block:: c
+
+	a = b * c + d
+
+.. code-block:: c
+
+	t_1 = b * c
+	t_2 = t_1 + d
+	a = t_2
+
+.. code-block:: asm
+
+	mov    -0xc(%rbp), %eax
+	imul   -0x10(%rbp), %eax
+
+	mov    -0x14(%rbp), %ecx
+	add    %ecx, %eax
+
+	mov    %eax, -0x8(%rbp)
 
 .. nextslide::
 
@@ -333,33 +357,6 @@ Optimization
 * Code is often transformed into single static assignment form, where variables
   are only used once, and transformations are assigned to a new variable. This
   makes code easier to reason about and optimize.
-
-
-Single Static Assignment
-------------------------
-
-Original code:
-
-.. code-block:: c
-
-	a = 1
-	b = a
-	a = b + 1
-
-SSA transformation:
-
-.. code-block:: c
-
-	a_1 = 1
-	b_1 = a_1
-	a_2 = b_1 + 1
-
-Optimized result:
-
-.. code-block:: c
-
-	a_1 = 1
-	a_2 = a_1 + 1
 
 
 Optimization
@@ -439,16 +436,14 @@ Abstract syntax tree
 
 ::
 
-	Module:(
+	Module(
 		body=[
-			Expr(
-				value=Attribute(
-					value=Name(
-						id='test', ctx=Load()
-					),
-					attr='py',
-					ctx=Load()
-				)
+			Print(
+				dest=None,
+				values=[
+					Str(s='hello world')
+				],
+				nl=True
 			)
 		]
 	)
@@ -463,10 +458,60 @@ keeps track of the state of the program.
 
 ::
 
-	G1Uc
-	hello worldN(
-	test.pyt
-	<module>
+	?
+	?ӫUc@s	dGHdS(s
+				   hello worldN((((stest.py<module>s
+
+
+How is bytecode different than assembly?
+----------------------------------------
+
+::
+
+	$ python
+	>>> import dis
+	>>> def p(a):
+	...    print "hello " + a + "!"
+	... 
+	>>> dis.dis(p)
+				  0 LOAD_CONST               1 ('hello ')
+				  3 LOAD_FAST                0 (a)
+				  6 BINARY_ADD          
+				  7 LOAD_CONST               2 ('!')
+				 10 BINARY_ADD          
+				 11 PRINT_ITEM          
+				 12 PRINT_NEWLINE       
+				 13 LOAD_CONST               0 (None)
+				 16 RETURN_VALUE        
+
+
+A closer comparison
+-------------------
+
+::
+
+	  0 LOAD_CONST        1 ('hello ')
+	  3 LOAD_FAST         0 (a)
+	  6 BINARY_ADD   
+	  7 LOAD_CONST        2 ('!')
+	 10 BINARY_ADD   
+	 11 PRINT_ITEM   
+	 12 PRINT_NEWLINE
+	 13 LOAD_CONST        0 (None)
+	 16 RETURN_VALUE 
+
+::
+
+	   0:	push   %rbp            # push stack pointer
+	   1:	mov    %rsp,%rbp
+	   4:	lea    0x0(%rip),%rdi  # load memory contents into the register
+	   b:	mov    $0x0,%eax
+	  10:	callq  15 <_main+0x15> # call printf
+	  15:	mov    $0x0,%eax       # prepare return code
+	  1a:	pop    %rbp            # pop stack base pointer
+	  1b:	retq                   # return
+
+
 
 Pros of interpreters
 --------------------
