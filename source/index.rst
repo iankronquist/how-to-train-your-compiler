@@ -300,9 +300,13 @@ Compilation to Intermediate Representation
 Three Address Code
 ------------------
 
+The original Statement:
+
 .. code-block:: c
 
-	a = b * c + d
+	a = b * c + d;
+
+Converted to SSA and three address code:
 
 .. code-block:: c
 
@@ -310,17 +314,22 @@ Three Address Code
 	t_2 = t_1 + d
 	a = t_2
 
+Compiled all the way to assembly:
+
 .. code-block:: asm
 
 	mov    -0xc(%rbp), %eax
 	imul   -0x10(%rbp), %eax
-
 	mov    -0x14(%rbp), %ecx
 	add    %ecx, %eax
-
 	mov    %eax, -0x8(%rbp)
 
-.. nextslide::
+.. note:: Great if you're going all the way to assembly, but you lose a lot of
+	information. What the Dragon Book recommends.
+
+
+Higher Level Intermediate Representation
+----------------------------------------
 
 ::
 
@@ -337,6 +346,9 @@ Three Address Code
 	}
 
 	declare i32 @puts(i8*) #1
+
+.. note:: Since you lose a lot of details a higher level form is more useful.
+	Clang can be used to compile C++ to Javascript.
 
 Building a Control Flow Graph
 -----------------------------
