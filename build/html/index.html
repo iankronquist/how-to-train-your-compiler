@@ -1,0 +1,673 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>How To Train Your Compiler &mdash; How To Train Your Compiler: The Dragon Book, condensed 2015.04.17 documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '2015.04.17',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="How To Train Your Compiler: The Dragon Book, condensed 2015.04.17 documentation" href="#" />
+   
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9">
+
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="nav-item nav-item-0"><a href="#">How To Train Your Compiler: The Dragon Book, condensed 2015.04.17 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="how-to-train-your-compiler">
+<h1>How To Train Your Compiler<a class="headerlink" href="#how-to-train-your-compiler" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="id1">
+<h2>How To Train Your Compiler<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p><em>The Dragon Book, condensed</em></p>
+<div class="figure align-center">
+<img alt="_images/DragonMedium.png" src="_images/DragonMedium.png" />
+</div>
+</div>
+<div class="section" id="who-am-i">
+<h2>Who am I?<a class="headerlink" href="#who-am-i" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Ian Kronquist</li>
+<li><a class="reference external" href="mailto:iankronquist&#37;&#52;&#48;gmail&#46;com">iankronquist<span>&#64;</span>gmail<span>&#46;</span>com</a></li>
+<li>Senior studying Computer Science at Oregon State University</li>
+<li>Developer at the OSU Open Source Lab</li>
+<li>Summer 2015 intern at Puppet Labs on the language team</li>
+</ul>
+<div class="figure align-center">
+<img alt="_images/osllogo.png" src="_images/osllogo.png" />
+</div>
+</div>
+<div class="section" id="about-this-talk">
+<h2>About this talk<a class="headerlink" href="#about-this-talk" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>This talk is available in several formats from 45 minutes to around an hour
+and 15.</li>
+<li>The shorter version you&#8217;re watching on video today completely skips Just In
+Time Compilers, which is the final section.</li>
+<li>The first part about compilers has examples in C.</li>
+<li>The second part has examples in python.</li>
+</ul>
+</div>
+<div class="section" id="what-is-a-compiler-or-interpreter">
+<h2>What is a compiler or interpreter?<a class="headerlink" href="#what-is-a-compiler-or-interpreter" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Quick review.</li>
+<li>Even those of you who aren&#8217;t programmers probably wind up using a compiler in
+your web browser.</li>
+</ul>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/dragon_book.jpg"><img alt="_images/dragon_book.jpg" src="_images/dragon_book.jpg" style="width: 30%;" /></a>
+</div>
+</div>
+<div class="section" id="the-difference-between-compilers-and-interpreters">
+<h2>The difference between compilers and interpreters<a class="headerlink" href="#the-difference-between-compilers-and-interpreters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Compilers take in human readable source code and emit machine executable
+instructions or byte code, usually as an executable file.</li>
+<li>Interpreters take in human readable source code and execute it directly.</li>
+<li>It&#8217;s not just black and white. There are lots of things in between, often
+called Just In Time compilers.</li>
+</ul>
+</div>
+<div class="section" id="source-code">
+<h2>Source code<a class="headerlink" href="#source-code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c"><div class="highlight"><pre><span class="cp">#include &lt;stdio.h&gt;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">puts</span><span class="p">(</span><span class="s">&quot;Hello world!&quot;</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/three_headed.jpg"><img alt="_images/three_headed.jpg" src="_images/three_headed.jpg" style="width: 30%;" /></a>
+</div>
+</div>
+<div class="section" id="machine-code">
+<h2>Machine code<a class="headerlink" href="#machine-code" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>0000000 cf fa ed fe 07 00 00 01 03 00 00 80 02 00 00 00
+0000010 10 00 00 00 10 05 00 00 85 00 20 00 00 00 00 00
+0000020 19 00 00 00 48 00 00 00 5f 5f 50 41 47 45 5a 45
+0000030 52 4f 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0000040 00 00 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+0000050 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+0000060 00 00 00 00 00 00 00 00 19 00 00 00 28 02 00 00
+0000070 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
+0000080 00 00 00 00 01 00 00 00 00 10 00 00 00 00 00 00
+0000090 00 00 00 00 00 00 00 00 00 10 00 00 00 00 00 00
+00000a0 07 00 00 00 05 00 00 00 06 00 00 00 00 00 00 00
+00000b0 5f 5f 74 65 78 74 00 00 00 00 00 00 00 00 00 00
+00000c0 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
+00000d0 50 0f 00 00 01 00 00 00 21 00 00 00 00 00 00 00
+00000e0 50 0f 00 00 04 00 00 00 00 00 00 00 00 00 00 00
+00000f0 00 04 00 80 00 00 00 00 00 00 00 00 00 00 00 00
+0000100 5f 5f 73 74 75 62 73 00 00 00 00 00 00 00 00 00
+0000110 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
+0000120 72 0f 00 00 01 00 00 00 06 00 00 00 00 00 00 00
+0000130 72 0f 00 00 01 00 00 00 00 00 00 00 00 00 00 00
+0000140 08 04 00 80 00 00 00 00 06 00 00 00 00 00 00 00
+0000150 5f 5f 73 74 75 62 5f 68 65 6c 70 65 72 00 00 00
+0000160 5f 5f 54 45 58 54 00 00 00 00 00 00 00 00 00 00
+</pre></div>
+</div>
+</div>
+<div class="section" id="what-happened">
+<h2>What happened?<a class="headerlink" href="#what-happened" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">(Optionally) Preprocessing and Macro expansion.</p>
+</li>
+<li><dl class="first docutils">
+<dt>Compiler Front end:</dt>
+<dd><ul class="first last simple">
+<li>Lexing/tokenizing.</li>
+<li>Parsing.</li>
+<li>Compilation to an intermediate representation.</li>
+<li>Platoform independent optimization.</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><dl class="first docutils">
+<dt>Compiler Back end:</dt>
+<dd><ul class="first last simple">
+<li>Platform specific optimizations.</li>
+<li>Compilation to target machine code (Mach-O 64-bit executable x86_64)</li>
+</ul>
+</dd>
+</dl>
+</li>
+<li><p class="first">Linking. Putting together multiple compiled files. We&#8217;ll ignore this today.</p>
+</li>
+</ul>
+</div>
+<div class="section" id="lexical-analysis">
+<h2>Lexical Analysis<a class="headerlink" href="#lexical-analysis" title="Permalink to this headline">¶</a></h2>
+<p>The code needs to be split into tokens.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="c1">// this is a comment</span>
+<span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span><span class="p">;</span>
+<span class="n">func</span> <span class="p">(</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span><span class="p">,</span> <span class="n">c</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Becomes something like:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="p">[</span><span class="s">&#39;int&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;=&#39;</span><span class="p">,</span> <span class="s">&#39;1&#39;</span><span class="p">,</span> <span class="s">&#39;+&#39;</span><span class="p">,</span> <span class="s">&#39;3&#39;</span><span class="p">]</span>
+<span class="p">[</span><span class="s">&#39;func&#39;</span><span class="p">,</span> <span class="s">&#39;(&#39;</span><span class="p">,</span> <span class="s">&#39;a&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="s">&#39;b&#39;</span><span class="p">,</span> <span class="s">&#39;,&#39;</span> <span class="s">&#39;c&#39;</span><span class="p">,</span> <span class="s">&#39;)&#39;</span><span class="p">];</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="parsing-and-grammars">
+<h2>Parsing and Grammars<a class="headerlink" href="#parsing-and-grammars" title="Permalink to this headline">¶</a></h2>
+<p>Programming languages are like natural languages. They follow a set of rules
+called a grammar.</p>
+<p>Parsing happens according to a grammar. Grammars need to specify what happens
+in otherwise ambiguous situations. Consider this example in C.</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">---</span><span class="n">b</span>
+</pre></div>
+</div>
+<p>Which does this mean?</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">c</span> <span class="o">=</span> <span class="p">(</span><span class="n">a</span><span class="o">--</span><span class="p">)</span><span class="o">-</span><span class="n">b</span>
+<span class="n">c</span> <span class="o">=</span> <span class="n">a</span><span class="o">-</span><span class="p">(</span><span class="o">--</span><span class="n">b</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sample-grammar-for-cinch">
+<h2>Sample grammar for Cinch<a class="headerlink" href="#sample-grammar-for-cinch" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>int ::= [0-9]
+id ::= [a-zA-Z]
+id_list ::= id | id id_list | epsilon
+binary_expr ::= int operator expr | id operator expr
+                          | function_call operator expr
+operator ::= &#39;=&#39; | &#39;+&#39; | &#39;-&#39;
+
+stmt ::= expr | while_loop | if_statment | function_definition
+stmt_list ::= stmt stmt_list | stmt | epsilon
+
+expr ::= int | binary_expr | id | function_call
+expr_list ::= expr expr_list | expr | epsilon
+
+if_stmt ::= &#39;if&#39; &#39;(&#39; expr &#39;)&#39; &#39;{&#39; stmt_list &#39;}&#39;
+
+while_loop ::= &#39;while&#39; &#39;(&#39; expr &#39;)&#39; &#39;{&#39; stmt_list &#39;}&#39;
+
+function_call ::= id &#39;(&#39; expr_list &#39;)&#39;
+function_definition ::= &#39;function&#39; id &#39;(&#39; id_list &#39;)&#39; &#39;{&#39; stmt_list &#39;}&#39;
+return_stmt ::= &#39;return&#39; expr
+</pre></div>
+</div>
+</div>
+<div class="section" id="some-interesting-parts-of-the-grammar">
+<h2>Some Interesting Parts of the Grammar<a class="headerlink" href="#some-interesting-parts-of-the-grammar" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre>integer_literal ::= [0-9]
+identifier ::= [a-zA-Z]
+</pre></div>
+</div>
+<div class="highlight-python"><div class="highlight"><pre>if_statement ::= &#39;if&#39; &#39;(&#39; expression &#39;)&#39; &#39;{&#39; statement_list &#39;}&#39;
+statement ::= expression | while_loop | if_statment | function_definition
+statement_list ::= statement statement_list | statement | epsilon
+</pre></div>
+</div>
+</div>
+<div class="section" id="parsing">
+<h2>Parsing<a class="headerlink" href="#parsing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Possibly the hardest part.</li>
+<li>Build a special kind of tree from the code called an Abstract Syntax Tree</li>
+</ul>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/ast.png"><img alt="_images/ast.png" src="_images/ast.png" style="width: 90%;" /></a>
+</div>
+</div>
+<div class="section" id="abstract-syntax-trees">
+<h2>Abstract Syntax Trees<a class="headerlink" href="#abstract-syntax-trees" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-c"><div class="highlight"><pre><span class="kt">int</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kt">int</span> <span class="n">a</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">b</span> <span class="o">=</span> <span class="mi">21</span><span class="p">;</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">a</span><span class="o">/</span><span class="n">b</span><span class="p">;</span>
+        <span class="k">return</span> <span class="n">a</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="figure align-left">
+<a class="reference internal image-reference" href="_images/worth_two_in_the_bush.jpg"><img alt="_images/worth_two_in_the_bush.jpg" src="_images/worth_two_in_the_bush.jpg" style="width: 40%;" /></a>
+</div>
+<p>An AST dumped from clang</p>
+<div class="highlight-python"><div class="highlight"><pre>`-FunctionDecl main &#39;int ()&#39;
+  `-CompoundStmt
+    |-DeclStmt
+    | `-VarDecl used a &#39;int&#39; cinit
+    |   `-IntegerLiteral &#39;int&#39; 0
+    |-DeclStmt
+    | `-VarDecl used b &#39;int&#39; cinit
+    |   `-IntegerLiteral &#39;int&#39; 21
+    |-BinaryOperator &#39;int&#39; &#39;=&#39;
+    | |-DeclRefExpr &#39;int&#39; lvalue Var &#39;a&#39; &#39;int&#39;
+    | `-BinaryOperator &#39;int&#39; &#39;/&#39;
+    |   |-ImplicitCastExpr &#39;int&#39; &lt;LValueToRValue&gt;
+    |   | `-DeclRefExpr &#39;int&#39; lvalue Var &#39;a&#39; &#39;int&#39;
+    |   `-ImplicitCastExpr &#39;int&#39; &lt;LValueToRValue&gt;
+    |     `-DeclRefExpr &#39;int&#39; lvalue Var &#39;b&#39; &#39;int&#39;
+    `-ReturnStmt
+      `-ImplicitCastExpr &#39;int&#39; &lt;LValueToRValue&gt;
+        `-DeclRefExpr &#39;int&#39; lvalue Var &#39;a&#39; &#39;int&#39;
+</pre></div>
+</div>
+</div>
+<div class="section" id="parsing-strategies">
+<h2>Parsing Strategies<a class="headerlink" href="#parsing-strategies" title="Permalink to this headline">¶</a></h2>
+<p>Parsing can be divided into two families</p>
+<p>Bottom Up Parsing:</p>
+<ul class="simple">
+<li>Recursive descent</li>
+<li>LL: Leftmost, Left to right.</li>
+</ul>
+<p>Top Down Parsing:</p>
+<ul class="simple">
+<li>Operator precedence</li>
+<li>LR: Left to Right
+- SLR: Simple Left to Right
+- Look Ahead Left to Right</li>
+<li>Shift-reduce parsing</li>
+</ul>
+<p>There are parser generators such as <code class="docutils literal"><span class="pre">bison</span></code> which take a formal grammar
+and emit C code which will parse it.</p>
+</div>
+<div class="section" id="look-ahead-left-to-right-parsing">
+<h2>Look Ahead Left to Right Parsing<a class="headerlink" href="#look-ahead-left-to-right-parsing" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Most modern languages use a LALR parsing strategy.</li>
+<li>Build the AST from bottom to top, left to right.</li>
+<li>No guessing or backtracking.</li>
+<li>A type of Shift-Reduce parser, shifting through the list of tokens, and
+reducing the tree to use smaller symbols.</li>
+</ul>
+</div>
+<div class="section" id="compilation-to-intermediate-representation">
+<h2>Compilation to Intermediate Representation<a class="headerlink" href="#compilation-to-intermediate-representation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Halfway between source code and machine code.</li>
+<li>Has detailed type information and annotations about what the
+source code means</li>
+<li>Also has machine details which can be used by the back end.</li>
+<li>IR is machine agnostic.</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>; ModuleID = &#39;test.c&#39;
+target datalayout = &quot;e-m:o-i64:64-f80:128-n8:16:32:64-S128&quot;
+target triple = &quot;x86_64-apple-macosx10.10.0&quot;
+
+@.str = private unnamed_addr constant [13 x i8] c&quot;Hello world!\00&quot;, align 1
+
+; Function Attrs: nounwind ssp uwtable
+define i32 @main() #0 {
+  %1 = call i32 @puts(i8* getelementptr inbounds ([13 x i8]* @.str, i32 0, i32 0))
+  ret i32 0
+}
+
+declare i32 @puts(i8*) #1
+</pre></div>
+</div>
+</div>
+<div class="section" id="building-a-control-flow-graph">
+<h2>Building a Control Flow Graph<a class="headerlink" href="#building-a-control-flow-graph" title="Permalink to this headline">¶</a></h2>
+<p>A graph of the flow of the code through the program via function calls,
+if statements, loops, etc.</p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/control_flow_graph.png"><img alt="_images/control_flow_graph.png" src="_images/control_flow_graph.png" style="width: 80%;" /></a>
+</div>
+</div>
+<div class="section" id="optimization">
+<h2>Optimization<a class="headerlink" href="#optimization" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Make the program go faster! Remove redundant work.</li>
+<li>Some optimizations are safe, others are dangerous and can affect how the
+program runs.</li>
+<li>Code is often transformed into single static assignment form, where variables
+are only used once, and transformations are assigned to a new variable. This
+makes code easier to reason about and optimize.</li>
+</ul>
+</div>
+<div class="section" id="single-static-assignment">
+<h2>Single Static Assignment<a class="headerlink" href="#single-static-assignment" title="Permalink to this headline">¶</a></h2>
+<p>Original code:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">a</span>
+<span class="n">a</span> <span class="o">=</span> <span class="n">b</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>SSA transformation:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">a_1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">b_1</span> <span class="o">=</span> <span class="n">a_1</span>
+<span class="n">a_2</span> <span class="o">=</span> <span class="n">b_1</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+<p>Optimized result:</p>
+<div class="highlight-c"><div class="highlight"><pre><span class="n">a_1</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">a_2</span> <span class="o">=</span> <span class="n">a_1</span> <span class="o">+</span> <span class="mi">1</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="id2">
+<h2>Optimization<a class="headerlink" href="#id2" title="Permalink to this headline">¶</a></h2>
+<p>Examples of optimizations:</p>
+<ul class="simple">
+<li>Function inlining: Jumping into functions is expensive. Sometimes a function
+can be stuck inside another function without affecting the program.</li>
+<li>Eliminating unused variables or return values.</li>
+<li>Eliminating dead code: Why compile it if you never use it?</li>
+<li>Transforming tail recursion: Transform tail recursion into a simple loop.</li>
+<li>Unrolling small loops: Sometimes multiple statements are faster than loops.</li>
+<li>Many many more.</li>
+</ul>
+</div>
+<div class="section" id="compilation-to-machine-code">
+<h2>Compilation to machine code<a class="headerlink" href="#compilation-to-machine-code" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>There are more things to cover and this is sort of boring.</li>
+</ul>
+<div class="highlight-asm"><div class="highlight"><pre>_main:                                  ## @main
+        .cfi_startproc
+Ltmp2:
+        .cfi_def_cfa_register %rbp
+        subq    $16, %rsp
+        leaq    L_.str(%rip), %rdi
+        callq   _puts
+        xorl    %ecx, %ecx
+        movl    %eax, -4(%rbp)          ## 4-byte Spill
+        movl    %ecx, %eax
+        addq    $16, %rsp
+        popq    %rbp
+        retq
+        .cfi_endproc
+        .section        __TEXT,__cstring,cstring_literals
+L_.str:                                 ## @.str
+        .asciz  &quot;Hello world!&quot;
+</pre></div>
+</div>
+</div>
+<div class="section" id="cons-of-compilers">
+<h2>Cons of compilers<a class="headerlink" href="#cons-of-compilers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Compilation is slow</li>
+<li>It&#8217;s a pain to wait around for the compiler</li>
+<li>Binaries are the opposite of human readable</li>
+<li>Binaries are system specific</li>
+</ul>
+</div>
+<div class="section" id="pros-of-compilers">
+<h2>Pros of compilers<a class="headerlink" href="#pros-of-compilers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Resulting binaries are wicked fast</li>
+<li>Optimization</li>
+<li>Compile time analysis (type checking, lifetime checking)</li>
+</ul>
+</div>
+<div class="section" id="let-s-trade-speed-for-usability">
+<h2>Let&#8217;s trade speed for usability<a class="headerlink" href="#let-s-trade-speed-for-usability" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Nobody wants to execute a mysterious binary</li>
+<li>Don&#8217;t want to recompile for every platform under the sun</li>
+</ul>
+</div>
+<div class="section" id="id3">
+<h2>Source code<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">print</span> <span class="s">&#39;hello world&#39;</span>
+</pre></div>
+</div>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/green_chinese_dragon.png"><img alt="_images/green_chinese_dragon.png" src="_images/green_chinese_dragon.png" style="width: 40%;" /></a>
+</div>
+</div>
+<div class="section" id="abstract-syntax-tree">
+<h2>Abstract syntax tree<a class="headerlink" href="#abstract-syntax-tree" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Parsing and lexing also happen, they look pretty similar</li>
+<li>Some interpreters walk the abstract syntax tree and executes the statements.
+This is slow</li>
+</ul>
+<div class="highlight-python"><div class="highlight"><pre>Module:(
+        body=[
+                Expr(
+                        value=Attribute(
+                                value=Name(
+                                        id=&#39;test&#39;, ctx=Load()
+                                ),
+                                attr=&#39;py&#39;,
+                                ctx=Load()
+                        )
+                )
+        ]
+)
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-byte-code-virtual-machine">
+<h2>A byte code Virtual Machine<a class="headerlink" href="#a-byte-code-virtual-machine" title="Permalink to this headline">¶</a></h2>
+<p>I lied, something does get emitted by Python. Python translates the script into
+bytecode. This bytecode is interpreted in a Virtual Machine.
+This isn&#8217;t a VM which emulates hardware. This is more like a state machine
+keeps track of the state of the program.</p>
+<div class="highlight-python"><div class="highlight"><pre>G1Uc
+hello worldN(
+test.pyt
+&lt;module&gt;
+</pre></div>
+</div>
+</div>
+<div class="section" id="pros-of-interpreters">
+<h2>Pros of interpreters<a class="headerlink" href="#pros-of-interpreters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Interpreted code will run anywhere the interpreter runs</li>
+<li>Dynamic languages where types and objects can be transformed
+at runtime are really hard to compile.</li>
+</ul>
+</div>
+<div class="section" id="cons-of-interpreters">
+<h2>Cons of interpreters<a class="headerlink" href="#cons-of-interpreters" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Slow</li>
+<li>Programming errors are not encountered until runtime. Errors on
+rarely taken code paths may take some time to find.</li>
+<li>You have to rewrite the interpreter for code to run.</li>
+</ul>
+</div>
+<div class="section" id="questions-feedback">
+<h2>Questions? Feedback?<a class="headerlink" href="#questions-feedback" title="Permalink to this headline">¶</a></h2>
+<p><em>Thank you</em></p>
+<p>Ian Kronquist</p>
+<p><a class="reference external" href="mailto:iankronquist&#37;&#52;&#48;gmail&#46;com">iankronquist<span>&#64;</span>gmail<span>&#46;</span>com</a></p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/black_baby_dragon.jpg"><img alt="_images/black_baby_dragon.jpg" src="_images/black_baby_dragon.jpg" style="width: 45%;" /></a>
+</div>
+</div>
+<div class="section" id="saved-by-the-bell-just-in-time-compilers">
+<h2>Saved by the bell: Just In Time compilers<a class="headerlink" href="#saved-by-the-bell-just-in-time-compilers" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>JITs combine the best parts of both worlds.</li>
+<li>JITs often have both compilers and interpreters. They are very complicated.</li>
+<li>JITs can be broken down into two groups, whole method JITs and Tracing JITs.</li>
+</ul>
+</div>
+<div class="section" id="bail-out">
+<h2>Bail out!<a class="headerlink" href="#bail-out" title="Permalink to this headline">¶</a></h2>
+<p>When working on dynamic languages like Python or Javascript, sometimes an
+object will change or an assumption the JIT made will become
+invalid, and the JIT compiler will need to &#8220;bail out&#8221; to the interpreter.</p>
+</div>
+<div class="section" id="whole-method-jits">
+<h2>Whole Method JITs<a class="headerlink" href="#whole-method-jits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Chuck each method into a compiler and execute it.</li>
+<li>There is a large up-front cost.</li>
+<li>Requires frequent recompilation when the structure of objects change.</li>
+</ul>
+<p>Examples:</p>
+<ul class="simple">
+<li>Google&#8217;s V8 Javascript Engine</li>
+<li>The WebKit Javascript Engine</li>
+<li>Mozilla&#8217;s IonMonkey Javascript Engine (with caveats)</li>
+<li>Rubinius for Ruby</li>
+<li>Pyston for Python</li>
+</ul>
+</div>
+<div class="section" id="tracing-jits">
+<h2>Tracing JITs<a class="headerlink" href="#tracing-jits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Interpret the code. If a loop is used a lot, stop, compile it and
+continue execution.</li>
+<li>Can compile a &#8216;hot loop&#8217; without compiling the rest of the function.</li>
+<li>Need really smart heuristics to figure out how often the code will be run. It
+would suck to run a loop four times, stop and compile the loop, and
+then run it just one more time.</li>
+</ul>
+<p>Examples:</p>
+<ul class="simple">
+<li>Mozilla&#8217;s old TraceMonkey Javascript JIT</li>
+<li>LuaJIT</li>
+<li>PyPy for Python, and many other languages</li>
+</ul>
+</div>
+<div class="section" id="pros-of-jits">
+<h2>Pros of JITs<a class="headerlink" href="#pros-of-jits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>The best way to make dynamic languages fast.</li>
+<li>Allow the same code to be executed across different systems.</li>
+<li>Allow some optimization of code.</li>
+</ul>
+</div>
+<div class="section" id="cons-of-jits">
+<h2>Cons of JITs<a class="headerlink" href="#cons-of-jits" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>High startup cost.</li>
+<li>Really complicated.</li>
+<li>Will never be as fast as compiled code.</li>
+<li>Can&#8217;t do all optimizations - some are very time consuming.</li>
+</ul>
+</div>
+<div class="section" id="id4">
+<h2>Questions? Feedback?<a class="headerlink" href="#id4" title="Permalink to this headline">¶</a></h2>
+<p><em>Thank you</em></p>
+<div class="figure align-center">
+<a class="reference internal image-reference" href="_images/black_baby_dragon.jpg"><img alt="_images/black_baby_dragon.jpg" src="_images/black_baby_dragon.jpg" style="width: 50%;" /></a>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">How To Train Your Compiler</a><ul>
+<li><a class="reference internal" href="#id1">How To Train Your Compiler</a></li>
+<li><a class="reference internal" href="#who-am-i">Who am I?</a></li>
+<li><a class="reference internal" href="#about-this-talk">About this talk</a></li>
+<li><a class="reference internal" href="#what-is-a-compiler-or-interpreter">What is a compiler or interpreter?</a></li>
+<li><a class="reference internal" href="#the-difference-between-compilers-and-interpreters">The difference between compilers and interpreters</a></li>
+<li><a class="reference internal" href="#source-code">Source code</a></li>
+<li><a class="reference internal" href="#machine-code">Machine code</a></li>
+<li><a class="reference internal" href="#what-happened">What happened?</a></li>
+<li><a class="reference internal" href="#lexical-analysis">Lexical Analysis</a></li>
+<li><a class="reference internal" href="#parsing-and-grammars">Parsing and Grammars</a></li>
+<li><a class="reference internal" href="#sample-grammar-for-cinch">Sample grammar for Cinch</a></li>
+<li><a class="reference internal" href="#some-interesting-parts-of-the-grammar">Some Interesting Parts of the Grammar</a></li>
+<li><a class="reference internal" href="#parsing">Parsing</a></li>
+<li><a class="reference internal" href="#abstract-syntax-trees">Abstract Syntax Trees</a></li>
+<li><a class="reference internal" href="#parsing-strategies">Parsing Strategies</a></li>
+<li><a class="reference internal" href="#look-ahead-left-to-right-parsing">Look Ahead Left to Right Parsing</a></li>
+<li><a class="reference internal" href="#compilation-to-intermediate-representation">Compilation to Intermediate Representation</a></li>
+<li><a class="reference internal" href="#building-a-control-flow-graph">Building a Control Flow Graph</a></li>
+<li><a class="reference internal" href="#optimization">Optimization</a></li>
+<li><a class="reference internal" href="#single-static-assignment">Single Static Assignment</a></li>
+<li><a class="reference internal" href="#id2">Optimization</a></li>
+<li><a class="reference internal" href="#compilation-to-machine-code">Compilation to machine code</a></li>
+<li><a class="reference internal" href="#cons-of-compilers">Cons of compilers</a></li>
+<li><a class="reference internal" href="#pros-of-compilers">Pros of compilers</a></li>
+<li><a class="reference internal" href="#let-s-trade-speed-for-usability">Let&#8217;s trade speed for usability</a></li>
+<li><a class="reference internal" href="#id3">Source code</a></li>
+<li><a class="reference internal" href="#abstract-syntax-tree">Abstract syntax tree</a></li>
+<li><a class="reference internal" href="#a-byte-code-virtual-machine">A byte code Virtual Machine</a></li>
+<li><a class="reference internal" href="#pros-of-interpreters">Pros of interpreters</a></li>
+<li><a class="reference internal" href="#cons-of-interpreters">Cons of interpreters</a></li>
+<li><a class="reference internal" href="#questions-feedback">Questions? Feedback?</a></li>
+<li><a class="reference internal" href="#saved-by-the-bell-just-in-time-compilers">Saved by the bell: Just In Time compilers</a></li>
+<li><a class="reference internal" href="#bail-out">Bail out!</a></li>
+<li><a class="reference internal" href="#whole-method-jits">Whole Method JITs</a></li>
+<li><a class="reference internal" href="#tracing-jits">Tracing JITs</a></li>
+<li><a class="reference internal" href="#pros-of-jits">Pros of JITs</a></li>
+<li><a class="reference internal" href="#cons-of-jits">Cons of JITs</a></li>
+<li><a class="reference internal" href="#id4">Questions? Feedback?</a></li>
+</ul>
+</li>
+</ul>
+
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Ian Kronquist.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.3.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.3</a>
+      
+      |
+      <a href="_sources/index.txt"
+          rel="nofollow">Page source</a></li>
+    </div>
+
+    
+
+    
+  </body>
+</html>
