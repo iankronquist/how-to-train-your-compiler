@@ -5,12 +5,13 @@
 How To Train Your Compiler
 ==========================
 
-How To Train Your Compiler
---------------------------
-*The Dragon Book, condensed*
+.. rst-class:: bottom
+
+	*The Dragon Book, condensed*
 
 .. figure:: /_static/DragonMedium.png
-	:align: center
+	:class: titleimage
+	:width: 60%
 
 Ian Kronquist
 -------------
