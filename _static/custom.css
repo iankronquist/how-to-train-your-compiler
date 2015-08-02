@@ -1,0 +1,26 @@
+.left {
+	width: 47.5%;
+	float: left;
+}
+
+.right {
+	width: 47.5%;
+	float: right;
+}
+
+.bottom {
+	bottom: 8%;
+	position: absolute;
+}
+
+.titleimage {
+    display: block;
+	margin-left: auto;
+	margin-right: auto;
+	min-width: 93%;
+}
+
+h1 {
+	bottom: 14%;
+	position: absolute;
+}
