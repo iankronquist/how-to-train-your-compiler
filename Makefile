@@ -196,3 +196,7 @@ slides:
 	$(SPHINXBUILD) -b slides $(ALLSPHINXOPTS) $(BUILDDIR)/slides
 	@echo "Build finished. The HTML slides are in $(BUILDDIR)/slides."
 
+gh-pages:
+	$(SPHINXBUILD) -b slides $(ALLSPHINXOPTS) .
+	@echo "Build finished. The HTML slides are in $(BUILDDIR)/slides."
+
